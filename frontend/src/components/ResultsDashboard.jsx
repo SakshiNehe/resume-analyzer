@@ -11,9 +11,9 @@ export default function ResultsDashboard({ result, onReset }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111' }}>Analysis Results</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
+          {/* <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
             {metadata?.chunks_processed} resume sections processed · {metadata?.chunks_retrieved} most relevant retrieved · {metadata?.model_used}
-          </p>
+          </p> */}
         </div>
         <button
           onClick={onReset}

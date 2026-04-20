@@ -12,25 +12,44 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [apiError, setApiError] = useState('');
 
-  const handleSubmit = async (file, jobDescription) => {
-    setApiError('');
-    setView(VIEWS.LOADING);
+const handleSubmit = async (file, jobDescription) => {
+  setApiError('');
+  setView(VIEWS.LOADING);
 
-    try {
-      const data = await analyzeResume(file, jobDescription);
-      if (data.success) {
-        setResult(data);
-        setView(VIEWS.RESULTS);
-      } else {
-        setApiError(data.error || 'Analysis failed. Please try again.');
-        setView(VIEWS.UPLOAD);
-      }
-    } catch (err) {
-      const msg = err.response?.data?.detail || err.message || 'Something went wrong.';
-      setApiError(msg);
+  try {
+    const data = await analyzeResume(file, jobDescription);
+
+    if (data.success) {
+      setResult(data);
+
+      // ✅ HISTORY LOGIC HERE (correct place)
+      const entry = {
+        id: Date.now(),
+        timestamp: new Date().toLocaleString(),
+        score: data.analysis.compatibility_score,
+        recommendation: data.analysis.overall_recommendation,
+        result: data
+      };
+
+      const saved = localStorage.getItem('analysisHistory');
+      const prevHistory = saved ? JSON.parse(saved) : [];
+
+      const updated = [entry, ...prevHistory].slice(0, 10);
+
+      setHistory(updated);
+      localStorage.setItem('analysisHistory', JSON.stringify(updated));
+
+      setView(VIEWS.RESULTS);
+    } else {
+      setApiError(data.error || 'Analysis failed. Please try again.');
       setView(VIEWS.UPLOAD);
     }
-  };
+  } catch (err) {
+    const msg = err.response?.data?.detail || err.message || 'Something went wrong.';
+    setApiError(msg);
+    setView(VIEWS.UPLOAD);
+  }
+};
 
   const handleReset = () => {
     setResult(null);
