@@ -5,25 +5,20 @@ from sentence_transformers import SentenceTransformer
 # and has excellent semantic understanding for English text.
 # Downloads ~90MB once to C:\Users\you\.cache\huggingface\
 # After that, loads from disk in ~2 seconds every time.
-_model = SentenceTransformer('all-MiniLM-L6-v2')
+import os
+from sentence_transformers import SentenceTransformer
+
+# SENTENCE_TRANSFORMERS_HOME env var controls cache location
+MODEL_NAME = 'all-MiniLM-L6-v2'
+
+print(f"Loading embedding model: {MODEL_NAME}")
+_model = SentenceTransformer(MODEL_NAME)
+print("Embedding model loaded successfully")
 
 def get_embedding(text: str) -> list[float]:
-    """
-    Converts one text string into a vector of 384 numbers.
-    These numbers capture the MEANING of the text, not just keywords.
-    'Python developer' and 'software engineer using Python' will have
-    very similar vectors even though the words are different.
-    """
     text = text.replace("\n", " ")
-    embedding = _model.encode(text, convert_to_numpy=True)
-    return embedding.tolist()
+    return _model.encode(text, convert_to_numpy=True).tolist()
 
 def get_embeddings_batch(texts: list[str]) -> list[list[float]]:
-    """
-    Encodes multiple texts at once — much faster than one at a time
-    because the model processes them in parallel internally.
-    Used when storing all resume chunks at once.
-    """
     texts = [t.replace("\n", " ") for t in texts]
-    embeddings = _model.encode(texts, convert_to_numpy=True)
-    return embeddings.tolist()
+    return _model.encode(texts, convert_to_numpy=True).tolist()

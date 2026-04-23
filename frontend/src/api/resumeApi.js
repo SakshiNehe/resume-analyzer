@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Base URL for all API calls. During development, backend runs on 8000.
 // In production you'd change this to your deployed backend URL.
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 /**
  * Sends the resume file and job description to the backend.
