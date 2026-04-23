@@ -1,2 +1,14 @@
-cd backend
-.\venv\Scripts\python.exe -m pip freeze > requirements.txt
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+pydantic-settings
+python-dotenv
+groq
+chromadb
+sentence-transformers
+PyPDF2
+python-docx
+langchain-text-splitters
+langchain-core
+httpx
