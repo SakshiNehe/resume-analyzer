@@ -6,7 +6,7 @@ pydantic-settings
 python-dotenv
 groq
 chromadb
-sentence-transformers
+fastembed
 PyPDF2
 python-docx
 langchain-text-splitters

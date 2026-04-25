@@ -1,24 +1,23 @@
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
-# WHY THIS MODEL: 'all-MiniLM-L6-v2' is the most popular lightweight
-# embedding model. It produces 384-dimensional vectors, is fast on CPU,
-# and has excellent semantic understanding for English text.
-# Downloads ~90MB once to C:\Users\you\.cache\huggingface\
-# After that, loads from disk in ~2 seconds every time.
-import os
-from sentence_transformers import SentenceTransformer
+# fastembed uses ONNX runtime — much lighter than PyTorch
+# all-MiniLM-L6-v2 via ONNX uses ~80MB RAM vs ~400MB with sentence-transformers
+# Same model, same 384-dimensional output, same quality
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
-# SENTENCE_TRANSFORMERS_HOME env var controls cache location
-MODEL_NAME = 'all-MiniLM-L6-v2'
-
-print(f"Loading embedding model: {MODEL_NAME}")
-_model = SentenceTransformer(MODEL_NAME)
-print("Embedding model loaded successfully")
+print(f"Loading embedding model via fastembed: {MODEL_NAME}")
+_model = TextEmbedding(model_name=MODEL_NAME)
+print("Embedding model ready")
 
 def get_embedding(text: str) -> list[float]:
-    text = text.replace("\n", " ")
-    return _model.encode(text, convert_to_numpy=True).tolist()
+    """Convert one text string to a 384-dimensional vector."""
+    text = text.replace("\n", " ").strip()
+    # fastembed returns a generator — convert to list first
+    embeddings = list(_model.embed([text]))
+    return embeddings[0].tolist()
 
 def get_embeddings_batch(texts: list[str]) -> list[list[float]]:
-    texts = [t.replace("\n", " ") for t in texts]
-    return _model.encode(texts, convert_to_numpy=True).tolist()
+    """Convert multiple texts to vectors in one efficient pass."""
+    texts = [t.replace("\n", " ").strip() for t in texts]
+    embeddings = list(_model.embed(texts))
+    return [e.tolist() for e in embeddings]
