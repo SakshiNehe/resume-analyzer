@@ -1,23 +1,22 @@
-from fastembed import TextEmbedding
+from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2
 
-# fastembed uses ONNX runtime — much lighter than PyTorch
-# all-MiniLM-L6-v2 via ONNX uses ~80MB RAM vs ~400MB with sentence-transformers
-# Same model, same 384-dimensional output, same quality
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+# ChromaDB's built-in embedding function
+# Uses pre-compiled ONNX binary — no Rust, no PyTorch, no compilation
+# Same all-MiniLM-L6-v2 model, 384 dimensions, ~50MB RAM
+# Works on Render free tier without any issues
 
-print(f"Loading embedding model via fastembed: {MODEL_NAME}")
-_model = TextEmbedding(model_name=MODEL_NAME)
-print("Embedding model ready")
+print("Loading ChromaDB built-in embedding function...")
+_ef = ONNXMiniLM_L6_V2()
+print("Embedding function ready")
 
 def get_embedding(text: str) -> list[float]:
     """Convert one text string to a 384-dimensional vector."""
     text = text.replace("\n", " ").strip()
-    # fastembed returns a generator — convert to list first
-    embeddings = list(_model.embed([text]))
-    return embeddings[0].tolist()
+    result = _ef([text])
+    return list(result[0])
 
 def get_embeddings_batch(texts: list[str]) -> list[list[float]]:
     """Convert multiple texts to vectors in one efficient pass."""
     texts = [t.replace("\n", " ").strip() for t in texts]
-    embeddings = list(_model.embed(texts))
-    return [e.tolist() for e in embeddings]
+    result = _ef(texts)
+    return [list(e) for e in result]

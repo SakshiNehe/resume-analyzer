@@ -11,7 +11,6 @@ os.makedirs(settings.chroma_persist_dir, exist_ok=True)
 
 app = FastAPI(
     title="AI Resume Analyzer",
-    description="RAG-powered resume analysis — free tier optimized",
     version="2.0.0",
 )
 
@@ -33,13 +32,12 @@ app.include_router(resume.router)
 
 @app.on_event("startup")
 async def startup_event():
-    """Pre-load the embedding model once at startup."""
-    from app.services.embedding_service import get_embedding
+    """Pre-load embedding model once at startup to avoid cold-start on first request."""
     print("Pre-warming embedding model...")
-    # Run one dummy embedding to load model into memory
-    get_embedding("warmup")
-    gc.collect()  # free any unused memory after loading
-    print("Server ready")
+    from app.services.embedding_service import get_embedding
+    get_embedding("warmup test")
+    gc.collect()
+    print("All systems ready")
 
 @app.get("/")
 async def root():
